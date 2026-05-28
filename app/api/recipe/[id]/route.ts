@@ -84,5 +84,7 @@ export async function GET(
     sourceUrl:   raw.sourceUrl ?? '',
   }
 
-  return NextResponse.json(detail)
+  return NextResponse.json(detail, {
+    headers: { 'Cache-Control': 'private, max-age=300, stale-while-revalidate=3600' },
+  })
 }

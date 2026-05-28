@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useTransition } from 'react'
+import { useState, useTransition, useMemo } from 'react'
 import Image from 'next/image'
 import RecipeSearch from './RecipeSearch'
 import SettingsPanel from './SettingsPanel'
@@ -30,10 +30,10 @@ function formatWeek(weekStart: string): string {
   return `${fmt(start)} – ${fmt(end)}`
 }
 
-const SLOTS: { key: MealSlot; label: string; icon: string }[] = [
-  { key: 'meal1', label: 'Meal 1', icon: '🍽' },
-  { key: 'meal2', label: 'Meal 2', icon: '🍽' },
-  { key: 'snack', label: 'Snack',  icon: '🥜' },
+const SLOTS: { key: MealSlot; label: string }[] = [
+  { key: 'meal1', label: 'Meal 1' },
+  { key: 'meal2', label: 'Meal 2' },
+  { key: 'snack', label: 'Snack'  },
 ]
 
 // ─── component ──────────────────────────────────────────────────────────────
@@ -54,6 +54,7 @@ export default function DietShell({
   initialPrepEntries: PrepEntry[]
 }) {
   const today       = new Date()
+  const todayIso    = today.toISOString().split('T')[0]
   const thisMonday  = initialWeekStart
 
   const [activeTab, setActiveTab]   = useState<'planner' | 'prep'>('planner')
@@ -67,8 +68,11 @@ export default function DietShell({
   const [, startTransition] = useTransition()
 
   // Build a lookup map: `${weekStart}|${day}|${slot}` → PlannedMeal
-  const mealMap = new Map<string, PlannedMeal>()
-  meals.forEach(m => mealMap.set(`${m.weekStart}|${m.day}|${m.slot}`, m))
+  const mealMap = useMemo(() => {
+    const map = new Map<string, PlannedMeal>()
+    meals.forEach(m => map.set(`${m.weekStart}|${m.day}|${m.slot}`, m))
+    return map
+  }, [meals])
 
   function getMeal(day: number, slot: MealSlot): PlannedMeal | undefined {
     return mealMap.get(`${weekStart}|${day}|${slot}`)
@@ -228,7 +232,7 @@ export default function DietShell({
           const totals = dayTotals(dayIdx)
           const calPct = Math.min(100, Math.round((totals.cal / settings.calorieTarget) * 100))
           const proPct = Math.min(100, Math.round((totals.pro / settings.proteinTarget) * 100))
-          const isToday = iso === today.toISOString().split('T')[0]
+          const isToday = iso === todayIso
 
           return (
             <div
@@ -255,13 +259,13 @@ export default function DietShell({
                 <div className="mb-3 flex flex-col gap-1">
                   <div className="h-1 w-full overflow-hidden rounded-full bg-bg-secondary">
                     <div
-                      className="h-full rounded-full bg-orange-400 transition-all"
+                      className="h-full rounded-full bg-orange-400 transition-[width]"
                       style={{ width: `${calPct}%` }}
                     />
                   </div>
                   <div className="h-1 w-full overflow-hidden rounded-full bg-bg-secondary">
                     <div
-                      className="h-full rounded-full bg-emerald-500 transition-all"
+                      className="h-full rounded-full bg-emerald-500 transition-[width]"
                       style={{ width: `${proPct}%` }}
                     />
                   </div>
@@ -274,11 +278,10 @@ export default function DietShell({
 
               {/* Slots */}
               <div className="flex flex-col gap-2">
-                {SLOTS.map(({ key, label, icon }) => {
+                {SLOTS.map(({ key, label }) => {
                   const meal = getMeal(dayIdx, key)
                   return (
                     <div key={key} className="flex items-center gap-2">
-                      <span className="w-3 text-base leading-none">{icon}</span>
                       {meal ? (
                         <div className="flex flex-1 items-center gap-2 rounded-lg bg-bg-secondary px-2.5 py-1.5">
                           {meal.image && (
@@ -288,7 +291,6 @@ export default function DietShell({
                               width={40}
                               height={30}
                               className="h-7 w-10 rounded object-cover"
-                              unoptimized
                             />
                           )}
                           <div className="flex-1 min-w-0">
@@ -302,21 +304,21 @@ export default function DietShell({
                             title="View recipe"
                             className="shrink-0 text-xs text-text-secondary hover:text-text-primary"
                           >
-                            📋
+                            View
                           </button>
                           <button
                             onClick={() => setSearchTarget({ day: dayIdx, slot: key })}
                             title="Replace"
                             className="shrink-0 text-xs text-text-secondary hover:text-text-primary"
                           >
-                            ↩
+                            Swap
                           </button>
                           <button
                             onClick={() => handleRemove(dayIdx, key)}
                             title="Remove"
                             className="shrink-0 text-xs text-text-secondary hover:text-red-500"
                           >
-                            ×
+                            Remove
                           </button>
                         </div>
                       ) : (

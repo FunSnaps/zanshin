@@ -36,9 +36,9 @@ export default function RecipeSearch({ day, dayLabel, slot, slotLabel, onSelect,
       if (!res.ok) throw new Error('Search failed')
       const data: { results: RecipeResult[] } = await res.json()
       setResults(data.results)
-      if (data.results.length === 0) setError('No recipes found — try different keywords.')
+      if (data.results.length === 0) setError('No recipes found. Try different keywords.')
     } catch {
-      setError('Search failed. Check your Spoonacular API key.')
+      setError('Search failed. Please try again.')
     } finally {
       setLoading(false)
     }
@@ -57,7 +57,7 @@ export default function RecipeSearch({ day, dayLabel, slot, slotLabel, onSelect,
             <p className="text-sm font-medium text-text-primary">Add to {slotLabel}</p>
             <p className="text-xs text-text-secondary">{dayLabel}</p>
           </div>
-          <button onClick={onClose} className="text-xl leading-none text-text-secondary">×</button>
+          <button onClick={onClose} className="text-sm text-text-secondary hover:text-text-primary">Close</button>
         </div>
 
         {/* Search controls */}
@@ -67,7 +67,7 @@ export default function RecipeSearch({ day, dayLabel, slot, slotLabel, onSelect,
               value={query}
               onChange={e => setQuery(e.target.value)}
               onKeyDown={e => e.key === 'Enter' && search()}
-              placeholder="Search recipes…"
+              placeholder="Search recipes"
               className="flex-1 rounded-lg border border-border-subtle bg-bg-secondary px-3 py-2 text-sm text-text-primary placeholder:text-text-secondary"
             />
             <button
@@ -75,7 +75,7 @@ export default function RecipeSearch({ day, dayLabel, slot, slotLabel, onSelect,
               disabled={loading || !query.trim()}
               className="rounded-lg bg-text-primary px-4 py-2 text-sm font-medium text-bg-primary disabled:opacity-40"
             >
-              {loading ? '…' : 'Search'}
+              {loading ? 'Searching' : 'Search'}
             </button>
           </div>
           <div className="flex gap-2">
@@ -103,7 +103,7 @@ export default function RecipeSearch({ day, dayLabel, slot, slotLabel, onSelect,
           {error && <p className="py-4 text-center text-sm text-text-secondary">{error}</p>}
           {results.length === 0 && !error && !loading && (
             <p className="py-8 text-center text-sm text-text-secondary">
-              Search for a recipe above — filter by protein or calories to match your targets.
+              Search by name, then filter by protein or calories.
             </p>
           )}
           <div className="flex flex-col gap-2">
@@ -120,7 +120,6 @@ export default function RecipeSearch({ day, dayLabel, slot, slotLabel, onSelect,
                     width={56}
                     height={42}
                     className="h-10 w-14 rounded-lg object-cover"
-                    unoptimized
                   />
                 )}
                 <div className="flex-1 min-w-0">

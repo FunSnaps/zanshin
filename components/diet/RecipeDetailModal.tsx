@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import Image from 'next/image'
 import type { RecipeDetail, RecipeIngredient } from '@/lib/types'
 
@@ -21,18 +21,21 @@ export default function RecipeDetailModal({ recipeId, title, image, portions, on
     fetch(`/api/recipe/${recipeId}`)
       .then(r => r.ok ? r.json() : Promise.reject(r.statusText))
       .then((d: RecipeDetail) => setDetail(d))
-      .catch(() => setError('Could not load recipe. Check your API key.'))
+      .catch(() => setError('Could not load recipe. Please try again.'))
       .finally(() => setLoading(false))
   }, [recipeId])
 
   const scale = detail ? portions / (detail.servings || 1) : 1
 
   // Group ingredients by aisle
-  const byAisle = detail?.ingredients.reduce<Record<string, RecipeIngredient[]>>((acc, ing) => {
-    const key = ing.aisle || 'Other'
-    ;(acc[key] ??= []).push(ing)
-    return acc
-  }, {}) ?? {}
+  const byAisle = useMemo(
+    () => detail?.ingredients.reduce<Record<string, RecipeIngredient[]>>((acc, ing) => {
+      const key = ing.aisle || 'Other'
+      ;(acc[key] ??= []).push(ing)
+      return acc
+    }, {}) ?? {},
+    [detail],
+  )
 
   return (
     <div
@@ -50,12 +53,11 @@ export default function RecipeDetailModal({ recipeId, title, image, portions, on
                 width={56}
                 height={42}
                 className="h-10 w-14 shrink-0 rounded-lg object-cover"
-                unoptimized
               />
             )}
             <p className="text-sm font-medium leading-snug text-text-primary">{title}</p>
           </div>
-          <button onClick={onClose} className="shrink-0 text-xl leading-none text-text-secondary">×</button>
+          <button onClick={onClose} className="shrink-0 text-sm text-text-secondary hover:text-text-primary">Close</button>
         </div>
 
         {/* Body */}
@@ -82,13 +84,13 @@ export default function RecipeDetailModal({ recipeId, title, image, portions, on
                   <div key={aisle}>
                     <p className="mb-1 text-[10px] font-medium uppercase tracking-wider text-text-secondary opacity-70">{aisle}</p>
                     <ul className="flex flex-col gap-0.5">
-                      {ings.map((ing, i) => {
+                      {ings.map((ing) => {
                         const scaledAmt = ing.amount * scale
                         const displayAmt = scaledAmt % 1 === 0
                           ? scaledAmt.toFixed(0)
                           : scaledAmt.toFixed(1)
                         return (
-                          <li key={i} className="flex items-baseline gap-1.5 text-sm text-text-primary">
+                          <li key={ing.name} className="flex items-baseline gap-1.5 text-sm text-text-primary">
                             <span className="text-text-secondary">·</span>
                             <span className="font-medium">{displayAmt}{ing.unit && ` ${ing.unit}`}</span>
                             <span>{ing.name}</span>

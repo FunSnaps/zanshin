@@ -88,7 +88,7 @@ export default function SessionsShell({ initialSessions }: { initialSessions: Tr
           </div>
           <div className="mb-4 flex flex-col gap-1">
             <label className="text-xs text-text-secondary">Notes</label>
-            <textarea name="notes" rows={3} placeholder="What clicked? What needs work? Any coach feedback?"
+            <textarea name="notes" rows={3} placeholder="Notes, coach feedback, what to revisit"
               className="rounded-lg border border-border-subtle bg-bg-primary px-3 py-2 text-sm text-text-primary" />
           </div>
           {error && <p className="mb-3 text-xs text-red-600">{error}</p>}

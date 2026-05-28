@@ -23,7 +23,8 @@ export default async function DietPage() {
     supabase
       .from('meal_plan')
       .select('id, week_start, day, slot, recipe_id, recipe_title, recipe_image, calories, protein')
-      .eq('user_id', user!.id),
+      .eq('user_id', user!.id)
+      .gte('week_start', new Date(Date.now() - 56 * 86400000).toISOString().split('T')[0]),
     supabase
       .from('user_settings')
       .select('calorie_target, protein_target')
@@ -32,7 +33,8 @@ export default async function DietPage() {
     supabase
       .from('meal_prep')
       .select('id, week_start, recipe_id, recipe_title, recipe_image, portions, prepped')
-      .eq('user_id', user!.id),
+      .eq('user_id', user!.id)
+      .gte('week_start', new Date(Date.now() - 56 * 86400000).toISOString().split('T')[0]),
   ])
 
   const meals: PlannedMeal[] = (mealsRes.data ?? []).map(r => ({

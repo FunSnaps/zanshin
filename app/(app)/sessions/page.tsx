@@ -11,6 +11,7 @@ export default async function SessionsPage() {
     .select('id, date, disc, techs, notes')
     .eq('user_id', user!.id)
     .order('date', { ascending: false })
+    .limit(100)
 
   const sessions: TrainingSession[] = (data ?? []).map(r => ({
     id:    r.id,

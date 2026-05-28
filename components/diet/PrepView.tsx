@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useTransition } from 'react'
+import { useState, useTransition, useMemo } from 'react'
 import Image from 'next/image'
 import RecipeDetailModal from './RecipeDetailModal'
 import { savePrepEntry, togglePrepped } from '@/actions/savePrepPlan'
@@ -68,10 +68,18 @@ export default function PrepView({
   const [shoppingLoading, setShoppingLoading] = useState(false)
   const [, startTransition] = useTransition()
 
-  const cards = buildRecipeCards(meals, weekStart, localEntries)
+  const cards = useMemo(
+    () => buildRecipeCards(meals, weekStart, localEntries),
+    [meals, weekStart, localEntries],
+  )
+
+  const entryIndex = useMemo(
+    () => new Map(localEntries.map(e => [`${e.weekStart}|${e.recipeId}`, e])),
+    [localEntries],
+  )
 
   function getEntry(recipeId: number) {
-    return localEntries.find(e => e.weekStart === weekStart && e.recipeId === recipeId)
+    return entryIndex.get(`${weekStart}|${recipeId}`)
   }
 
   function updateLocal(recipeId: number, patch: Partial<PrepEntry>) {
@@ -168,15 +176,18 @@ export default function PrepView({
   }
 
   // Group shopping list by aisle across all recipes
-  const aisleMap = shoppingData.reduce<Record<string, { recipe: string; item: string }[]>>((acc, r) => {
-    ;(acc[r.aisle] ??= []).push(...r.ingredients.map(i => ({ recipe: r.title, item: i.original })))
-    return acc
-  }, {})
+  const aisleMap = useMemo(
+    () => shoppingData.reduce<Record<string, { recipe: string; item: string }[]>>((acc, r) => {
+      ;(acc[r.aisle] ??= []).push(...r.ingredients.map(i => ({ recipe: r.title, item: i.original })))
+      return acc
+    }, {}),
+    [shoppingData],
+  )
 
   if (cards.length === 0) {
     return (
       <p className="py-12 text-center text-sm text-text-secondary">
-        No meals planned for this week yet. Add some in the Planner tab.
+        No meals planned this week.
       </p>
     )
   }
@@ -206,7 +217,6 @@ export default function PrepView({
                     width={56}
                     height={42}
                     className="h-10 w-14 shrink-0 rounded-lg object-cover"
-                    unoptimized
                   />
                 )}
                 <div className="flex-1 min-w-0">
@@ -257,7 +267,7 @@ export default function PrepView({
                         : 'border-border-subtle text-text-secondary hover:text-text-primary'
                     }`}
                   >
-                    {prepped ? '✓ Prepped' : 'Mark done'}
+                    {prepped ? 'Prepped' : 'Mark done'}
                   </button>
                 </div>
               </div>
@@ -271,8 +281,8 @@ export default function PrepView({
         onClick={shoppingOpen ? () => setShoppingOpen(false) : generateShoppingList}
         className="mb-3 flex w-full items-center justify-between rounded-xl border border-border-subtle px-4 py-3 text-left"
       >
-        <span className="text-sm font-medium text-text-primary">🛒 Shopping List</span>
-        <span className="text-text-secondary">{shoppingOpen ? '▲' : '▼'}</span>
+        <span className="text-sm font-medium text-text-primary">Shopping List</span>
+        <span className="text-xs text-text-secondary">{shoppingOpen ? 'Hide' : 'Show'}</span>
       </button>
 
       {shoppingOpen && (
@@ -281,7 +291,7 @@ export default function PrepView({
             <p className="py-4 text-center text-sm text-text-secondary">Building list…</p>
           )}
           {!shoppingLoading && Object.keys(aisleMap).length === 0 && (
-            <p className="text-sm text-text-secondary">Nothing found — are your recipes using Spoonacular?</p>
+            <p className="text-sm text-text-secondary">No ingredients found.</p>
           )}
           {!shoppingLoading && Object.entries(aisleMap).map(([aisle, items]) => (
             <div key={aisle} className="mb-3">

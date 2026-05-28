@@ -5,7 +5,7 @@ import './globals.css'
 const inter = Inter({ subsets: ['latin'], variable: '--font-sans' })
 
 export const metadata: Metadata = {
-  title: 'Zanshin — MMA Journal',
+  title: 'Zanshin - MMA Journal',
   description: 'Your personal technique library',
 }
 

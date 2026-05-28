@@ -10,14 +10,13 @@ export default function Header({ email }: { email: string }) {
     const sb = createClient()
     await sb.auth.signOut()
     router.push('/login')
-    router.refresh()
   }
 
   return (
     <div className="mb-6 flex items-start justify-between">
       <div>
         <h1 className="text-xl font-medium text-text-primary">MMA Journal</h1>
-        <p className="mt-0.5 text-xs text-text-secondary">Your personal technique library</p>
+        <p className="mt-0.5 text-xs text-text-secondary">Technique library &amp; training log</p>
       </div>
       <div className="flex items-center gap-3">
         <span className="hidden text-xs text-text-secondary sm:block">{email}</span>

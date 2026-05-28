@@ -1,5 +1,3 @@
-'use client'
-
 import { getTechniques, parseKey } from '@/lib/data/techniques'
 import type { TechniqueLog } from '@/lib/types'
 
@@ -16,10 +14,9 @@ export default function ReviewShell({
   return (
     <>
       {/* Banner */}
-      <div className="mb-5 flex items-start gap-3 rounded-xl border border-amber-300 bg-amber-50 px-4 py-3.5">
-        <span className="text-xl">🔥</span>
+      <div className="mb-5 rounded-xl border border-amber-300 bg-amber-50 px-4 py-3.5">
         <p className="text-sm leading-relaxed text-amber-900">
-          Coming back after a break? Here&apos;s your mental warm-up — most recently logged techniques by discipline.
+          Last logged techniques by discipline. Use this to orient before training.
         </p>
       </div>
 
@@ -45,13 +42,13 @@ export default function ReviewShell({
 
       {/* Grappling recent */}
       <p className="mb-2 text-xs font-medium uppercase tracking-wide text-text-secondary">
-        Grappling — most recent
+        Grappling
       </p>
       <TechGrid logs={gLogs.slice(0, 4)} loggedClass="border-l-[3px] border-l-emerald-600" />
 
       {/* Striking recent */}
       <p className="mb-2 mt-6 text-xs font-medium uppercase tracking-wide text-text-secondary">
-        Striking — most recent
+        Striking
       </p>
       <TechGrid logs={sLogs.slice(0, 4)} loggedClass="border-l-[3px] border-l-orange-600" />
     </>

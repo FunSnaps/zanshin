@@ -221,7 +221,7 @@ export default function LibraryShell({ initialLogs }: { initialLogs: TechniqueLo
             <p className="mb-1 text-[11px] uppercase tracking-wide text-text-secondary">Position / range</p>
             <p className="mb-3 text-sm text-text-primary">{modal.tech.position}</p>
 
-            <p className="mb-2 text-[11px] uppercase tracking-wide text-text-secondary">Execution — step by step</p>
+            <p className="mb-2 text-[11px] uppercase tracking-wide text-text-secondary">Execution</p>
             <ol className="mb-4 list-none space-y-0">
               {modal.tech.steps.map((step, i) => (
                 <li key={i} className="flex gap-2.5 border-b border-border-faint py-2 last:border-none">
@@ -242,7 +242,7 @@ export default function LibraryShell({ initialLogs }: { initialLogs: TechniqueLo
             <textarea
               value={notes}
               onChange={e => setNotes(e.target.value)}
-              placeholder="Personal cues, coach corrections, things that clicked..."
+              placeholder="Notes, cues, coach corrections"
               rows={3}
               className="w-full rounded-lg border border-border-subtle bg-bg-primary px-3 py-2 text-sm text-text-primary placeholder:text-text-secondary focus:outline-none focus:ring-1 focus:ring-border-primary"
             />
@@ -251,7 +251,7 @@ export default function LibraryShell({ initialLogs }: { initialLogs: TechniqueLo
               disabled={pending}
               className="mt-3 w-full rounded-lg bg-text-primary py-2 text-sm font-medium text-bg-primary disabled:opacity-50"
             >
-              {logs[modal.key]?.logged ? 'Update notes' : 'Save notes & mark logged'}
+              {logs[modal.key]?.logged ? 'Update notes' : 'Save & log'}
             </button>
           </div>
         </div>
