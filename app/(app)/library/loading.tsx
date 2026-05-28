@@ -1,34 +1,38 @@
-const P = ({ className }: { className: string }) => (
-  <div className={`animate-pulse rounded bg-bg-secondary ${className}`} />
+const Bone = ({ className }: { className: string }) => (
+  <div className={`animate-pulse rounded bg-border-subtle ${className}`} />
 )
 
 export default function Loading() {
   return (
     <div>
-      {/* Discipline pills */}
+      {/* Discipline toggle */}
       <div className="mb-3 flex gap-2">
-        <P className="h-8 w-24 rounded-full" />
-        <P className="h-8 w-20 rounded-full" />
+        <Bone className="h-8 w-28 rounded-full" />
+        <Bone className="h-8 w-24 rounded-full" />
       </div>
 
       {/* Sub-discipline pills */}
-      <div className="mb-1 flex gap-2">
-        <P className="h-7 w-12 rounded-full" />
-        <P className="h-7 w-20 rounded-full" />
-        <P className="h-7 w-14 rounded-full" />
+      <div className="mb-3 flex gap-2">
+        <Bone className="h-7 w-12 rounded-full" />
+        <Bone className="h-7 w-24 rounded-full" />
+        <Bone className="h-7 w-16 rounded-full" />
       </div>
 
       {/* Belt / level pills */}
-      <div className="mb-5 mt-3 flex gap-2">
-        {[14, 12, 16, 14, 12].map((w, i) => (
-          <P key={i} className={`h-6 rounded-full`} style={{ width: `${w * 5}px` } as React.CSSProperties} />
-        ))}
+      <div className="mb-5 flex gap-2">
+        <Bone className="h-6 w-16 rounded-full" />
+        <Bone className="h-6 w-14 rounded-full" />
+        <Bone className="h-6 w-20 rounded-full" />
+        <Bone className="h-6 w-16 rounded-full" />
+        <Bone className="h-6 w-14 rounded-full" />
       </div>
 
       {/* Technique cards */}
       <div className="flex flex-col gap-2">
-        {Array.from({ length: 9 }).map((_, i) => (
-          <P key={i} className="h-14 rounded-xl" />
+        {[75, 55, 85, 60, 70, 50, 80, 65, 55].map((w, i) => (
+          <div key={i} className="flex items-center gap-3 rounded-xl border border-border-faint bg-bg-primary px-4 py-3">
+            <Bone className="h-4 rounded" style={{ width: `${w}%` } as React.CSSProperties} />
+          </div>
         ))}
       </div>
     </div>
