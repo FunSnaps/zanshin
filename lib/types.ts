@@ -79,3 +79,33 @@ export interface UserSettings {
   calorieTarget: number
   proteinTarget: number
 }
+
+// ─── Recipe detail (from Spoonacular /recipes/{id}/information) ──────────────
+export interface RecipeIngredient {
+  name:     string
+  amount:   number
+  unit:     string
+  original: string  // e.g. "200g chicken breast, diced"
+  aisle:    string  // e.g. "Meat/Seafood"
+}
+
+export interface RecipeDetail {
+  id:           number
+  title:        string
+  image:        string
+  servings:     number
+  ingredients:  RecipeIngredient[]
+  steps:        string[]           // plain text steps in order
+  sourceUrl:    string
+}
+
+// ─── Meal Prep tracker ───────────────────────────────────────────────────────
+export interface PrepEntry {
+  id:          string
+  weekStart:   string
+  recipeId:    number
+  recipeTitle: string
+  recipeImage: string
+  portions:    number
+  prepped:     boolean
+}

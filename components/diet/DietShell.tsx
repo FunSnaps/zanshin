@@ -4,8 +4,10 @@ import { useState, useTransition } from 'react'
 import Image from 'next/image'
 import RecipeSearch from './RecipeSearch'
 import SettingsPanel from './SettingsPanel'
+import PrepView from './PrepView'
+import RecipeDetailModal from './RecipeDetailModal'
 import { saveMealPlan, removeMealPlan } from '@/actions/saveMealPlan'
-import type { PlannedMeal, MealSlot, RecipeResult, UserSettings } from '@/lib/types'
+import type { PlannedMeal, MealSlot, RecipeResult, UserSettings, PrepEntry } from '@/lib/types'
 
 // ─── helpers ────────────────────────────────────────────────────────────────
 
@@ -38,23 +40,30 @@ const SLOTS: { key: MealSlot; label: string; icon: string }[] = [
 
 interface SearchTarget { day: number; slot: MealSlot }
 
+interface DetailTarget { id: number; title: string; image: string; portions: number }
+
 export default function DietShell({
   initialMeals,
   initialSettings,
   initialWeekStart,
+  initialPrepEntries,
 }: {
-  initialMeals:     PlannedMeal[]
-  initialSettings:  UserSettings
-  initialWeekStart: string
+  initialMeals:       PlannedMeal[]
+  initialSettings:    UserSettings
+  initialWeekStart:   string
+  initialPrepEntries: PrepEntry[]
 }) {
   const today       = new Date()
   const thisMonday  = initialWeekStart
 
-  const [weekStart, setWeekStart] = useState(initialWeekStart)
-  const [meals, setMeals]         = useState(initialMeals)
-  const [settings, setSettings]   = useState(initialSettings)
+  const [activeTab, setActiveTab]   = useState<'planner' | 'prep'>('planner')
+  const [weekStart, setWeekStart]   = useState(initialWeekStart)
+  const [meals, setMeals]           = useState(initialMeals)
+  const [settings, setSettings]     = useState(initialSettings)
+  const [prepEntries]               = useState<PrepEntry[]>(initialPrepEntries)
   const [showSettings, setShowSettings] = useState(false)
   const [searchTarget, setSearchTarget] = useState<SearchTarget | null>(null)
+  const [detailTarget, setDetailTarget] = useState<DetailTarget | null>(null)
   const [, startTransition] = useTransition()
 
   // Build a lookup map: `${weekStart}|${day}|${slot}` → PlannedMeal
@@ -132,6 +141,37 @@ export default function DietShell({
 
   return (
     <>
+      {/* Tab toggle */}
+      <div className="mb-4 flex gap-1 rounded-lg bg-bg-secondary p-1">
+        {(['planner', 'prep'] as const).map(tab => (
+          <button
+            key={tab}
+            onClick={() => setActiveTab(tab)}
+            className={`flex-1 rounded-md py-1.5 text-center text-xs font-medium capitalize transition-all ${
+              activeTab === tab
+                ? 'border border-border-subtle bg-bg-primary text-text-primary shadow-sm'
+                : 'text-text-secondary hover:text-text-primary'
+            }`}
+          >
+            {tab === 'planner' ? 'Planner' : 'Prep & Shop'}
+          </button>
+        ))}
+      </div>
+
+      {/* Prep tab */}
+      {activeTab === 'prep' && (
+        <PrepView
+          meals={meals}
+          prepEntries={prepEntries}
+          weekStart={weekStart}
+          onViewRecipe={(id, title, image, portions) =>
+            setDetailTarget({ id, title, image, portions })
+          }
+        />
+      )}
+
+      {activeTab === 'planner' && (
+      <>
       {/* Week navigation */}
       <div className="mb-4 flex items-center gap-2">
         <button
@@ -258,6 +298,13 @@ export default function DietShell({
                             </p>
                           </div>
                           <button
+                            onClick={() => setDetailTarget({ id: meal.recipeId, title: meal.title, image: meal.image, portions: 1 })}
+                            title="View recipe"
+                            className="shrink-0 text-xs text-text-secondary hover:text-text-primary"
+                          >
+                            📋
+                          </button>
+                          <button
                             onClick={() => setSearchTarget({ day: dayIdx, slot: key })}
                             title="Replace"
                             className="shrink-0 text-xs text-text-secondary hover:text-text-primary"
@@ -289,6 +336,9 @@ export default function DietShell({
         })}
       </div>
 
+      </>
+      )}
+
       {/* Recipe search modal */}
       {searchTarget && activeSearchSlot && (
         <RecipeSearch
@@ -298,6 +348,17 @@ export default function DietShell({
           slotLabel={activeSearchSlot.label}
           onSelect={handleSelect}
           onClose={() => setSearchTarget(null)}
+        />
+      )}
+
+      {/* Recipe detail modal (from planner card click) */}
+      {detailTarget && (
+        <RecipeDetailModal
+          recipeId={detailTarget.id}
+          title={detailTarget.title}
+          image={detailTarget.image}
+          portions={detailTarget.portions}
+          onClose={() => setDetailTarget(null)}
         />
       )}
     </>

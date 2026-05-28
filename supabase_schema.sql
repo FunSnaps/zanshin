@@ -98,3 +98,28 @@ create policy "Users manage own settings"
   on user_settings for all
   using  (auth.uid() = user_id)
   with check (auth.uid() = user_id);
+
+-- ============================================================
+-- Meal Prep tracker — run this block after the above
+-- ============================================================
+
+-- 9. Batch cook tracker — unique recipe per week per user
+create table if not exists meal_prep (
+  id           uuid primary key default gen_random_uuid(),
+  user_id      uuid not null references auth.users(id) on delete cascade,
+  week_start   date not null,
+  recipe_id    int  not null,
+  recipe_title text not null,
+  recipe_image text not null default '',
+  portions     int  not null default 1 check (portions between 1 and 20),
+  prepped      boolean not null default false,
+  created_at   timestamptz not null default now(),
+  unique (user_id, week_start, recipe_id)
+);
+
+alter table meal_prep enable row level security;
+
+create policy "Users manage own prep plan"
+  on meal_prep for all
+  using  (auth.uid() = user_id)
+  with check (auth.uid() = user_id);
