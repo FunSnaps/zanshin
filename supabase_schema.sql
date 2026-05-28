@@ -54,3 +54,47 @@ create policy "Users manage own sessions"
   on sessions for all
   using  (auth.uid() = user_id)
   with check (auth.uid() = user_id);
+
+-- ============================================================
+-- Diet / Meal Planner — run this block after the above
+-- ============================================================
+
+-- 6. Weekly meal plan slots
+create table if not exists meal_plan (
+  id           uuid primary key default gen_random_uuid(),
+  user_id      uuid not null references auth.users(id) on delete cascade,
+  week_start   date not null,          -- Monday of the week (ISO date)
+  day          int  not null           -- 0 = Mon … 6 = Sun
+                    check (day between 0 and 6),
+  slot         text not null
+                    check (slot in ('meal1', 'meal2', 'snack')),
+  recipe_id    int  not null,
+  recipe_title text not null,
+  recipe_image text not null default '',
+  calories     int  not null default 0,
+  protein      int  not null default 0,
+  created_at   timestamptz not null default now(),
+  unique (user_id, week_start, day, slot)
+);
+
+-- 7. Per-user calorie / protein targets
+create table if not exists user_settings (
+  user_id        uuid primary key references auth.users(id) on delete cascade,
+  calorie_target int not null default 2500,
+  protein_target int not null default 150,
+  updated_at     timestamptz not null default now()
+);
+
+-- 8. RLS for new tables
+alter table meal_plan    enable row level security;
+alter table user_settings enable row level security;
+
+create policy "Users manage own meal plan"
+  on meal_plan for all
+  using  (auth.uid() = user_id)
+  with check (auth.uid() = user_id);
+
+create policy "Users manage own settings"
+  on user_settings for all
+  using  (auth.uid() = user_id)
+  with check (auth.uid() = user_id);

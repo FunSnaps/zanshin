@@ -36,7 +36,8 @@ export async function middleware(request: NextRequest) {
   const isAppRoute =
     pathname.startsWith('/library') ||
     pathname.startsWith('/sessions') ||
-    pathname.startsWith('/review')
+    pathname.startsWith('/review')  ||
+    pathname.startsWith('/diet')
 
   if (!user && isAppRoute) {
     return NextResponse.redirect(new URL('/login', request.url))

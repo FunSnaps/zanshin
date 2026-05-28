@@ -7,6 +7,7 @@ const TABS = [
   { label: 'Technique Library', href: '/library' },
   { label: 'Session Log',       href: '/sessions' },
   { label: 'Break Review',      href: '/review' },
+  { label: 'Meal Planner',      href: '/diet' },
 ]
 
 export default function NavTabs() {

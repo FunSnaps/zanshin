@@ -51,3 +51,31 @@ export interface DbSession {
   techs: string[]
   notes: string
 }
+
+// ── Diet / Meal Planner ────────────────────────────────────
+export type MealSlot = 'meal1' | 'meal2' | 'snack'
+
+export interface PlannedMeal {
+  id: string
+  weekStart: string   // ISO date of Monday, e.g. "2026-06-02"
+  day: number         // 0 = Mon … 6 = Sun
+  slot: MealSlot
+  recipeId: number
+  title: string
+  image: string
+  calories: number
+  protein: number
+}
+
+export interface RecipeResult {
+  id: number
+  title: string
+  image: string
+  calories: number
+  protein: number
+}
+
+export interface UserSettings {
+  calorieTarget: number
+  proteinTarget: number
+}
