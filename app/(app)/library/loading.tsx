@@ -1,5 +1,5 @@
-const Bone = ({ className }: { className: string }) => (
-  <div className={`animate-pulse rounded bg-border-subtle ${className}`} />
+const Bone = ({ className, style }: { className: string; style?: React.CSSProperties }) => (
+  <div className={`animate-pulse rounded bg-border-subtle ${className}`} style={style} />
 )
 
 export default function Loading() {
