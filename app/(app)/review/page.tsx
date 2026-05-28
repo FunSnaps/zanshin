@@ -1,10 +1,9 @@
-import { createClient } from '@/lib/supabase/server'
+import { createClient, getAuthUser } from '@/lib/supabase/server'
 import ReviewShell from '@/components/review/ReviewShell'
 import type { TechniqueLog } from '@/lib/types'
 
 export default async function ReviewPage() {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const [user, supabase] = await Promise.all([getAuthUser(), createClient()])
 
   const [logsRes, sessionCountRes] = await Promise.all([
     supabase

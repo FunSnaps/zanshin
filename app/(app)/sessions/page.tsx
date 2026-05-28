@@ -1,10 +1,9 @@
-import { createClient } from '@/lib/supabase/server'
+import { createClient, getAuthUser } from '@/lib/supabase/server'
 import SessionsShell from '@/components/sessions/SessionsShell'
 import type { TrainingSession } from '@/lib/types'
 
 export default async function SessionsPage() {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const [user, supabase] = await Promise.all([getAuthUser(), createClient()])
 
   const { data } = await supabase
     .from('sessions')

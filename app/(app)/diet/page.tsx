@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/server'
+import { createClient, getAuthUser } from '@/lib/supabase/server'
 import DietShell from '@/components/diet/DietShell'
 import type { PlannedMeal, UserSettings, PrepEntry } from '@/lib/types'
 
@@ -12,8 +12,7 @@ function thisMonday(): string {
 }
 
 export default async function DietPage() {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const [user, supabase] = await Promise.all([getAuthUser(), createClient()])
 
   const weekStart = thisMonday()
 

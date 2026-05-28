@@ -1,10 +1,9 @@
-import { createClient } from '@/lib/supabase/server'
+import { createClient, getAuthUser } from '@/lib/supabase/server'
 import LibraryShell from '@/components/library/LibraryShell'
 import type { TechniqueLog } from '@/lib/types'
 
 export default async function LibraryPage() {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const [user, supabase] = await Promise.all([getAuthUser(), createClient()])
 
   const { data } = await supabase
     .from('technique_logs')
